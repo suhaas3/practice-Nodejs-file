@@ -1,8 +1,7 @@
-const {sumOfTwoNumber, moduleWorking} = require('./sum.js');
-const {multiOFTwoNums} = require('./multiplication.js');
-
 // import { multiOFTwoNums } from "./multiplication.js";
 // import { sumOfTwoNumber , moduleWorking} from "./sum.js";
+
+const { sumOfTwoNumber, moduleWorking, multiOFTwoNums, divisonOfTwoNums } = require('./index');
 
 console.log('this is app.js fiel')
 

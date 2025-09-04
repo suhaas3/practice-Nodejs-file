@@ -13,6 +13,10 @@ app.get("/",(req,res) => {
   res.send("this is the initial data...");
 })
 
+app.get("/test",(req,res) => {
+  res.send("test the data is entry point to node js")
+})
+
 //start the server and listen for incoming requests
 app.listen(PORT,() => {
   console.log(`Server is running on port ${PORT}`);

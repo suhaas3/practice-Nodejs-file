@@ -1,9 +1,25 @@
 const express = require('express');//import the expree module
 
+const {adminAuth} = require('../UtilsModule/auth');
+
 const app = express();//create an express application instance
 
 const PORT = 3333;//define the port for the project
 
+app.get('/admin',adminAuth);
+
+app.get('/admin/getAllData',(req, res, next) => {
+  //Logic for checking if the request is autherized
+    res.send('GET All the data')
+})
+
+
+app.get('/admin/deleteUser',(req, res) => {
+  //Logic for checking if the request is autherized
+    res.send('Deleted a user');
+})
+
+/*
 //GET users => middleware chain => request handler
 
 app.get('/',(req, res, next) => {
@@ -30,6 +46,7 @@ app.get('/users',
   // next();
 }
 )
+*/
 
 // //define a basic route for the URL
 // app.get("/hello",(req,res) => {

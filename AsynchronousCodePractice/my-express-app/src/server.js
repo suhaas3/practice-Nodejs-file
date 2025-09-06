@@ -1,24 +1,42 @@
 const express = require('express');//import the expree module
 
-const {adminAuth} = require('../UtilsModule/auth');
+const { adminAuth, userAuth } = require('../UtilsModule/auth');
 
 const app = express();//create an express application instance
 
 const PORT = 3333;//define the port for the project
 
-app.get('/admin',adminAuth);
+app.get('/', (err, req, res, next) => {
+  if (err) {
+    res.status(500).send("something wrong");
+  }
+})
 
-app.get('/admin/getAllData',(req, res, next) => {
+app.get('/admin', adminAuth);
+
+app.get('/admin/getAllData', (req, res, next) => {
   //Logic for checking if the request is autherized
+  try {
+    // throw new Error('unexpected error!');
     res.send('GET All the data')
+  } catch (e) {
+    res.status(500).send("Some Error contact support team");
+  }
 })
 
 
-app.get('/admin/deleteUser',(req, res) => {
+app.get('/admin/deleteUser', (req, res) => {
   //Logic for checking if the request is autherized
-    res.send('Deleted a user');
+  res.send('Deleted a user');
 })
 
+app.get('/user/login', userAuth, (req, res) => {
+  res.send("user logged in succesfully");
+})
+
+app.get('/user/data', userAuth, (req, res) => {
+  res.send("All Data sent");
+})
 /*
 //GET users => middleware chain => request handler
 
@@ -62,7 +80,7 @@ app.get('/users',
 // })
 
 //start the server and listen for incoming requests
-app.listen(PORT,() => {
+app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   console.log(`Access it at http://localhost:${PORT}`)
 })

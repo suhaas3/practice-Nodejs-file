@@ -6,12 +6,27 @@ const app = express();//create an express application instance
 
 const PORT = 3333;//define the port for the project
 
-app.get('/', (err, req, res, next) => {
-  if (err) {
+/*
+//normal route (this works fine)
+app.get('/', (req, res) => {
     res.status(500).send("something wrong");
-  }
 })
 
+//route with Error (simulating an error)
+app.post('/error', (err, req, res, next) => {
+  const err1 = new Error("Something went wrong in /error route!");
+  next(err1);
+})
+
+//Error handling middleware (must have 4 params)
+app.use('/error/handle',(err, req, res, next) => {
+  console.error(err.stack); //log error details
+  res.status(500).json({
+    success:false,
+    message: err.message || "Internal server Error"
+  })
+})
+  */
 app.get('/admin', adminAuth);
 
 app.get('/admin/getAllData', (req, res, next) => {

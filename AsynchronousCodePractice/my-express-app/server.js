@@ -4,18 +4,45 @@ const app = express();//create an express application instance
 
 const PORT = 3333;//define the port for the project
 
-//define a basic route for the URL
-app.get("/hello",(req,res) => {
-  res.send("hello,node js!");
+//GET users => middleware chain => request handler
+
+app.get('/',(req, res, next) => {
+  // res.send('This is default Route!');
+  next();
 })
 
-app.get("/",(req,res) => {
-  res.send("this is the initial data...");
-})
+app.get('/users',
+  (req,res, next) => {
+  console.log('1st route log!');
+  // res.send("1st route handler!");
+  next();
+},
 
-app.get("/test",(req,res) => {
-  res.send("test the data is entry point to node js")
-})
+(req,res, next) => {
+  console.log('2nd route log!');
+  // res.send("2nd route handler!");
+    next();
+},
+
+(req, res, next) => {
+  console.log("3rd route log!");
+  res.send("3rd route handler!");
+  // next();
+}
+)
+
+// //define a basic route for the URL
+// app.get("/hello",(req,res) => {
+//   res.send("hello,node js!");
+// })
+
+// app.get("/",(req,res) => {
+//   res.send("this is the initial data...");
+// })
+
+// app.get("/test",(req,res) => {
+//   res.send("test the data is entry point to node js")
+// })
 
 //start the server and listen for incoming requests
 app.listen(PORT,() => {

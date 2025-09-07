@@ -1,14 +1,28 @@
 const express = require('express');//import the expree module
 const { adminAuth, userAuth } = require('../UtilsModule/auth');
 const { connectDb } = require('./config/database');
-
+const User = require('./models/user');
 const app = express();//create an express application instance
 
 const PORT = 3333;//define the port for the project
 
-app.get("/users", (req, res) => {
-  res.send("User data fetched");
+app.post("/signup", async (req, res) => {
+  //creating a new instance of the user model
+  const user = new User({
+    firstName: "jatangi",
+    lastName: "sai suhaas",
+    emailId: "suhaas3w@gmail.com",
+    password: "suhaassai3"
+  })
+
+  try {
+   await user.save();
+   res.send("user added successfully!");
+  } catch(err) {
+    res.status(400).send("Error saving the user:"+err.message);
+  }
 })
+
 
 /*
 //normal route (this works fine)

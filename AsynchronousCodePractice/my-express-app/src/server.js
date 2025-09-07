@@ -1,10 +1,14 @@
 const express = require('express');//import the expree module
-
 const { adminAuth, userAuth } = require('../UtilsModule/auth');
+const { connectDb } = require('./config/database');
 
 const app = express();//create an express application instance
 
 const PORT = 3333;//define the port for the project
+
+app.get("/users", (req, res) => {
+  res.send("User data fetched");
+})
 
 /*
 //normal route (this works fine)
@@ -27,6 +31,8 @@ app.use('/error/handle',(err, req, res, next) => {
   })
 })
   */
+
+/*
 app.get('/admin', adminAuth);
 
 app.get('/admin/getAllData', (req, res, next) => {
@@ -52,6 +58,7 @@ app.get('/user/login', userAuth, (req, res) => {
 app.get('/user/data', userAuth, (req, res) => {
   res.send("All Data sent");
 })
+  */
 /*
 //GET users => middleware chain => request handler
 
@@ -95,7 +102,15 @@ app.get('/users',
 // })
 
 //start the server and listen for incoming requests
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Access it at http://localhost:${PORT}`)
-})
+
+connectDb()
+  .then(() => {
+    console.log("Database connected successfully!");
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+      console.log(`Access it at http://localhost:${PORT}`)
+    })
+  })
+  .catch((err) => {
+    console.log("Connection Error:", err.message);
+  })

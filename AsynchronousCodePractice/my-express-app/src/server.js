@@ -6,23 +6,72 @@ const app = express();//create an express application instance
 
 const PORT = 3333;//define the port for the project
 
+app.use(express.json());
+
 app.post("/signup", async (req, res) => {
   //creating a new instance of the user model
-  const user = new User({
-    firstName: "jatangi",
-    lastName: "sai suhaas",
-    emailId: "suhaas3w@gmail.com",
-    password: "suhaassai3"
-  })
+  const user = new User(req.body);
 
   try {
-   await user.save();
-   res.send("user added successfully!");
-  } catch(err) {
-    res.status(400).send("Error saving the user:"+err.message);
+    await user.save();
+    res.send("user added successfully!");
+  } catch (err) {
+    res.status(400).send("Error saving the user:" + err.message);
   }
 })
 
+//GET user by emailId
+app.get('/getUser', async (req, res) => {
+  const emailId = req.body;
+  try {
+    const findUser = await User.find(emailId).exec();
+    res.send("user find successfully!");
+    console.log(findUser);
+  } catch (err) {
+    res.status(400).send("Something went wrong:", err.message);
+  }
+})
+
+//Fetch all users in database
+app.get('/fetchUsers', async (req, res) => {
+  try {
+    const getUsers = await User.find({}).exec();
+    res.send("users all are fetched!");
+    console.log(getUsers)
+  } catch (err) {
+    res.status(400).send("Something went wrong:", err.message);
+  }
+})
+
+//delete the user by id
+app.delete('/deleteUser', async (req, res) => {
+  const deletedId = req.body.deletedId;
+  try {
+    // const deleteUser = await User.findByIdAndDelete(deletedId);
+    const deleteUser = await User.findByIdAndDelete({ _id: deletedId });
+    res.send("user deleted successfully!");
+    console.log(deleteUser)
+  } catch (err) {
+    res.status(400).send("Something went wrong:", err.message);
+  }
+})
+
+//update the user by id
+app.patch("/updateUser", async (req, res) => {
+  const updateUserId = req.body.updateUserId;
+  const data = req.body;
+  console.log(data,"user dataaaaaaaaaaa")
+  try {
+    // const updateUser = User.findByIdAndUpdate({ _id: updateUserId });
+    const updateUser = await User.findByIdAndUpdate(updateUserId, data,{
+      new: true
+    });
+    console.log(updateUser,"updated user")
+    res.send("user updated Successfully!");
+  } catch (err) {
+    res.status(400).send("Something went wrong:", err.message);
+  }
+})
 
 /*
 //normal route (this works fine)

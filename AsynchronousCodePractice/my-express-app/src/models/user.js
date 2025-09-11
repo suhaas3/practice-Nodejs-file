@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -9,8 +10,8 @@ const userSchema = new mongoose.Schema({
   },
   lastName: {
     type: String,
-    min:3,
-    max:30
+    min: 3,
+    max: 30
   },
   emailId: {
     type: String,
@@ -18,10 +19,26 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     trim: true,
+    validate(value) {
+      if (!validator.isEmail(value)) {
+        throw new Error("Invalid Email!!!");
+      }
+    }
   },
   password: {
     type: String,
     required: true,
+    validate(value) {
+      if (!validator.isStrongPassword(value, {
+        minLength: 8,
+        minLowercase: 1,
+        minUppercase: 1,
+        minNumbers: 1,
+        minSymbols: 1
+      })) {
+        throw new Error("Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.");
+      }
+    },
   },
   age: {
     type: Number
@@ -41,8 +58,13 @@ const userSchema = new mongoose.Schema({
   photoUrl: {
     type: String,
     default: "https://www.vhv.rs/dpng/d/256-2569650_men-profile-icon-png-image-free-download-searchpng.png",
-  }, 
- skills: {
+    validate(value) {
+      if (!validator.isURL(value)) {
+        throw new Error("Invalid url");
+      }
+    }
+  },
+  skills: {
     type: [String],
     validate: {
       validator: function (val) {

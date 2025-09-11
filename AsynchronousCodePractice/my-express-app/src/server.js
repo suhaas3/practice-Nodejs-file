@@ -4,6 +4,7 @@ const { connectDb } = require('./config/database');
 const User = require('./models/user');
 const {validateSignUpData} = require('./utils/validation');
 const app = express();//create an express application instance
+const bcrypt = require('bcrypt');
 
 const PORT = 3333;//define the port for the project
 
@@ -16,11 +17,14 @@ app.post("/signup", async (req, res) => {
     //creating a new instance of the user model
     const {firstName, lastName, emailId, password, age, gender, skills, photoUrl} = req.body;
 
+    //Encrypt the password
+    const passwordHash = await bcrypt.hash(password,10);
+
     const user = new User({
       firstName,
       lastName,
       emailId,
-      password,
+      password: passwordHash,
       age,
       gender,
       skills,
@@ -30,6 +34,25 @@ app.post("/signup", async (req, res) => {
     res.send("user added successfully!");
   } catch (err) {
     res.status(400).send("Error saving the user:" + err.message);
+  }
+})
+
+app.post('/login', async (req, res) => {
+  try{const {emailId, password} = req.body;
+
+  const user = await User.findOne({emailId: emailId});
+  if (!user) {
+    throw new Error("Invalid Email!");
+  }
+
+  const isPasswordValid = await bcrypt.compare(password,user.password);
+
+  if (isPasswordValid) {
+    res.send("login successfull!");
+  } else {
+    throw new Error("password incorrect");
+  }} catch (err) {
+    res.status(400).send("ERROR: "+err.message);
   }
 })
 

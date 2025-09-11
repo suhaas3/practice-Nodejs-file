@@ -1,7 +1,8 @@
 const express = require('express');//import the expree module
-const { adminAuth, userAuth } = require('../UtilsModule/auth');
+const { adminAuth, userAuth } = require('./middlewares/auth');
 const { connectDb } = require('./config/database');
 const User = require('./models/user');
+const {validateSignUpData} = require('./utils/validation');
 const app = express();//create an express application instance
 
 const PORT = 3333;//define the port for the project
@@ -9,10 +10,22 @@ const PORT = 3333;//define the port for the project
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-  //creating a new instance of the user model
-  const user = new User(req.body);
-
   try {
+    //validation of data
+    validateSignUpData(req);
+    //creating a new instance of the user model
+    const {firstName, lastName, emailId, password, age, gender, skills, photoUrl} = req.body;
+
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password,
+      age,
+      gender,
+      skills,
+      photoUrl
+    });
     await user.save();
     res.send("user added successfully!");
   } catch (err) {

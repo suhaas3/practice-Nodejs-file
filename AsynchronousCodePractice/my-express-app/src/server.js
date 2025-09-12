@@ -55,7 +55,7 @@ app.post('/login', async (req, res) => {
 
       const token = await jwt.sign({ _id: user._id }, 'Dev@Tinder$790');
 
-      res.cookie("token", token);
+      res.cookie("token", token, { expires: new Date(Date.now() + 3600000 * 7) });
       res.send("login successfull!");
     } else {
       throw new Error("password incorrect");
@@ -71,6 +71,16 @@ app.get('/profile', userAuth, async (req, res) => {
     res.send(user);
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);
+  }
+})
+
+app.post('/sendConnetionRequest',userAuth, async (req, res) => {
+  try {
+    const {user} = req;
+
+    res.send(user.firstName+"  send the connection request...");
+  } catch (err) {
+    res.status(400).send("ERROR: "+err.message);
   }
 })
 

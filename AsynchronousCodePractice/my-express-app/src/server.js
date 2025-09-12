@@ -1,5 +1,5 @@
 const express = require('express');//import the expree module
-const { adminAuth, userAuth } = require('./middlewares/auth');
+const { userAuth } = require('./middlewares/auth');
 const { connectDb } = require('./config/database');
 const User = require('./models/user');
 const { validateSignUpData } = require('./utils/validation');
@@ -65,23 +65,9 @@ app.post('/login', async (req, res) => {
   }
 })
 
-app.get('/profile', async (req, res) => {
+app.get('/profile', userAuth, async (req, res) => {
   try {
-    const cookies = req.cookies;
-    const { token } = cookies;
-    if (!token) {
-      throw new Error("Token Invalid!");
-    }
-
-    const decodedMessage = await jwt.verify(token, 'Dev@Tinder$790')
-
-    const { _id } = decodedMessage;
-
-    const user = await User.findById(_id);
-    if (!user) {
-      throw new Error("User Not Found!");
-    }
-
+    const {user} = req;
     res.send(user);
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);

@@ -2,23 +2,26 @@ const express = require('express');//import the expree module
 const { adminAuth, userAuth } = require('./middlewares/auth');
 const { connectDb } = require('./config/database');
 const User = require('./models/user');
-const {validateSignUpData} = require('./utils/validation');
+const { validateSignUpData } = require('./utils/validation');
 const app = express();//create an express application instance
 const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 
 const PORT = 3333;//define the port for the project
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
   try {
     //validation of data
     validateSignUpData(req);
     //creating a new instance of the user model
-    const {firstName, lastName, emailId, password, age, gender, skills, photoUrl} = req.body;
+    const { firstName, lastName, emailId, password, age, gender, skills, photoUrl } = req.body;
 
     //Encrypt the password
-    const passwordHash = await bcrypt.hash(password,10);
+    const passwordHash = await bcrypt.hash(password, 10);
 
     const user = new User({
       firstName,
@@ -38,21 +41,50 @@ app.post("/signup", async (req, res) => {
 })
 
 app.post('/login', async (req, res) => {
-  try{const {emailId, password} = req.body;
+  try {
+    const { emailId, password } = req.body;
 
-  const user = await User.findOne({emailId: emailId});
-  if (!user) {
-    throw new Error("Invalid Email!");
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error("Invalid Email!");
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (isPasswordValid) {
+
+      const token = await jwt.sign({ _id: user._id }, 'Dev@Tinder$790');
+
+      res.cookie("token", token);
+      res.send("login successfull!");
+    } else {
+      throw new Error("password incorrect");
+    }
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
   }
+})
 
-  const isPasswordValid = await bcrypt.compare(password,user.password);
+app.get('/profile', async (req, res) => {
+  try {
+    const cookies = req.cookies;
+    const { token } = cookies;
+    if (!token) {
+      throw new Error("Token Invalid!");
+    }
 
-  if (isPasswordValid) {
-    res.send("login successfull!");
-  } else {
-    throw new Error("password incorrect");
-  }} catch (err) {
-    res.status(400).send("ERROR: "+err.message);
+    const decodedMessage = await jwt.verify(token, 'Dev@Tinder$790')
+
+    const { _id } = decodedMessage;
+
+    const user = await User.findById(_id);
+    if (!user) {
+      throw new Error("User Not Found!");
+    }
+
+    res.send(user);
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
   }
 })
 

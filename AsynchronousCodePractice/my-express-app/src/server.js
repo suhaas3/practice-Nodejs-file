@@ -49,11 +49,11 @@ app.post('/login', async (req, res) => {
       throw new Error("Invalid Email!");
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await user.validatePassword(password);
 
     if (isPasswordValid) {
 
-      const token = await jwt.sign({ _id: user._id }, 'Dev@Tinder$790');
+      const token = await user.getJwt();
 
       res.cookie("token", token, { expires: new Date(Date.now() + 3600000 * 7) });
       res.send("login successfull!");
@@ -67,20 +67,20 @@ app.post('/login', async (req, res) => {
 
 app.get('/profile', userAuth, async (req, res) => {
   try {
-    const {user} = req;
+    const { user } = req;
     res.send(user);
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);
   }
 })
 
-app.post('/sendConnetionRequest',userAuth, async (req, res) => {
+app.post('/sendConnetionRequest', userAuth, async (req, res) => {
   try {
-    const {user} = req;
+    const { user } = req;
 
-    res.send(user.firstName+"  send the connection request...");
+    res.send(user.firstName + "  send the connection request...");
   } catch (err) {
-    res.status(400).send("ERROR: "+err.message);
+    res.status(400).send("ERROR: " + err.message);
   }
 })
 

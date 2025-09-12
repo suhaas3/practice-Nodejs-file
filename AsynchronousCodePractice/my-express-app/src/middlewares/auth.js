@@ -8,7 +8,7 @@ const userAuth = async (req, res, next) => {
       throw new Error("Invalid Token!");
     }
 
-    const decodedMessage = await jwt.verify(token, 'Dev@Tinder$790', { expiresIn: '7d' });
+    const decodedMessage = await jwt.verify(token, 'Dev@Tinder$790');
 
     const { _id } = decodedMessage;
 

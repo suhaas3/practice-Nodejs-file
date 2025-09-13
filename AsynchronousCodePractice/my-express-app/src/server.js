@@ -1,11 +1,12 @@
-const express = require('express');//import the expree module
 const { userAuth } = require('./middlewares/auth');
+const express = require('express');//import the expree module
 const { connectDb } = require('./config/database');
 const User = require('./models/user');
 const app = express();//create an express application instance
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const authRouter = require('./routes/authRouter');
+const profileRouter = require('./routes/profileRouter');
 
 const PORT = 3333;//define the port for the project
 
@@ -13,18 +14,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/', authRouter);
+app.use('/', profileRouter);
 
-
-
-
-app.get('/profile', userAuth, async (req, res) => {
-  try {
-    const { user } = req;
-    res.send(user);
-  } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
-  }
-})
 
 app.post('/sendConnetionRequest', userAuth, async (req, res) => {
   try {
@@ -67,39 +58,6 @@ app.delete('/deleteUser', async (req, res) => {
     const deleteUser = await User.findByIdAndDelete({ _id: deletedId });
     res.send("user deleted successfully!");
     console.log(deleteUser)
-  } catch (err) {
-    res.status(400).send("Something went wrong:", err.message);
-  }
-})
-
-//update the user by id
-app.patch("/updateUser", async (req, res) => {
-  const { userId } = req.body;
-  const data = req.body;
-
-  try {
-    const ALLOWED_UPDATES = [
-      "userId",
-      "photoUrl",
-      "about",
-      "age",
-      "gender",
-      "skills"
-    ];
-
-    const isUpdateAllowed = Object.keys(data).every((k) => {
-      ALLOWED_UPDATES.includes(k);
-
-      if (!isUpdateAllowed) {
-        throw new Error("Update not allowed");
-      }
-    })
-    // const updateUser = User.findByIdAndUpdate({ _id: updateUserId });
-    const updateUser = await User.findByIdAndUpdate(userId, data, {
-      new: true
-    });
-
-    res.send("user updated Successfully!");
   } catch (err) {
     res.status(400).send("Something went wrong:", err.message);
   }

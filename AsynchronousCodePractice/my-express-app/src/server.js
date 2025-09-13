@@ -2,68 +2,20 @@ const express = require('express');//import the expree module
 const { userAuth } = require('./middlewares/auth');
 const { connectDb } = require('./config/database');
 const User = require('./models/user');
-const { validateSignUpData } = require('./utils/validation');
 const app = express();//create an express application instance
-const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
+const authRouter = require('./routes/authRouter');
 
 const PORT = 3333;//define the port for the project
 
 app.use(express.json());
 app.use(cookieParser());
 
-app.post("/signup", async (req, res) => {
-  try {
-    //validation of data
-    validateSignUpData(req);
-    //creating a new instance of the user model
-    const { firstName, lastName, emailId, password, age, gender, skills, photoUrl } = req.body;
+app.use('/', authRouter);
 
-    //Encrypt the password
-    const passwordHash = await bcrypt.hash(password, 10);
 
-    const user = new User({
-      firstName,
-      lastName,
-      emailId,
-      password: passwordHash,
-      age,
-      gender,
-      skills,
-      photoUrl
-    });
-    await user.save();
-    res.send("user added successfully!");
-  } catch (err) {
-    res.status(400).send("Error saving the user:" + err.message);
-  }
-})
 
-app.post('/login', async (req, res) => {
-  try {
-    const { emailId, password } = req.body;
-
-    const user = await User.findOne({ emailId: emailId });
-    if (!user) {
-      throw new Error("Invalid Email!");
-    }
-
-    const isPasswordValid = await user.validatePassword(password);
-
-    if (isPasswordValid) {
-
-      const token = await user.getJwt();
-
-      res.cookie("token", token, { expires: new Date(Date.now() + 3600000 * 7) });
-      res.send("login successfull!");
-    } else {
-      throw new Error("password incorrect");
-    }
-  } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
-  }
-})
 
 app.get('/profile', userAuth, async (req, res) => {
   try {

@@ -1,6 +1,7 @@
 const express = require('express');
 const { userAuth } = require("../middlewares/auth");
-const { validateEditProfileData } = require('../utils/validation');
+const { validateEditProfileData, validateEditPassword } = require('../utils/validation');
+const bcrypt = require('bcrypt');
 const profileRouter = express.Router();
 
 
@@ -33,6 +34,28 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
     })
   } catch (err) {
     res.status(400).send(`ERROR : ${err.message} `);
+  }
+})
+
+profileRouter.patch('/profile/password', userAuth, async (req, res) => {
+  try {
+    if (!validateEditPassword(req)) {
+      throw new Error("Inavlid credentials!");
+    }
+    const loggedInUser = req.user;
+    const { password } = req.body;
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    loggedInUser.password = passwordHash;
+
+    // Save changes
+    await loggedInUser.save();
+
+
+    res.send("password updated...")
+  } catch (err) {
+    res.status(400).send(`ERROR: ` + err.message);
   }
 })
 

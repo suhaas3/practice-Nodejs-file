@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const authRouter = require('./routes/authRouter');
 const profileRouter = require('./routes/profileRouter');
+const connectionRequestRouter = require('./routes/connectionRequestRouter');
 
 const PORT = 3333;//define the port for the project
 
@@ -15,17 +16,7 @@ app.use(cookieParser());
 
 app.use('/', authRouter);
 app.use('/', profileRouter);
-
-
-app.post('/sendConnetionRequest', userAuth, async (req, res) => {
-  try {
-    const { user } = req;
-
-    res.send(user.firstName + "  send the connection request...");
-  } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
-  }
-})
+app.use('/', connectionRequestRouter);
 
 //GET user by emailId
 app.get('/getUser', async (req, res) => {

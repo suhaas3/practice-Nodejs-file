@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const authRouter = require('./routes/authRouter');
 const profileRouter = require('./routes/profileRouter');
 const connectionRequestRouter = require('./routes/connectionRequestRouter');
+const userRouter = require('./routes/user');
 
 const PORT = 3333;//define the port for the project
 
@@ -17,6 +18,7 @@ app.use(cookieParser());
 app.use('/', authRouter);
 app.use('/', profileRouter);
 app.use('/', connectionRequestRouter);
+app.use('/', userRouter)
 
 //GET user by emailId
 app.get('/getUser', async (req, res) => {
